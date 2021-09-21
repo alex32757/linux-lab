@@ -33,13 +33,11 @@ int main(int argc, char* argv[]) {
     if(pid_child1 == 0) {
         sleep(atoi(argv[2]));
         writeFile("Child 1", output);
-        exit(0);
     }
     else {
         pid_child2 = vfork();
         if(pid_child2 == 0) {
             execl("child.out", " ", out_file_name, argv[3], "Child 2", NULL);
-            exit(0);
         } 
         else {
             sleep(atoi(argv[1]));
