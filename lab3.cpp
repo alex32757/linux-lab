@@ -7,11 +7,10 @@
 using namespace std;
 
 void writeFile(string processName, std::ofstream& output) {
-    pid_t pid = getpid();
     output<< processName << ": Идентификатор процесса --" << getpid() << endl;
     output<< processName << ": Идентификатор предка --" << getppid() << endl;
-    output<< processName << ": Идентификатор сессии процесса --" << getsid(pid) << endl;
-    output<< processName << ": Идентификатор группы процессов --" << getpgid(pid) << endl;
+    output<< processName << ": Идентификатор сессии процесса --" << getsid( getpid()) << endl;
+    output<< processName << ": Идентификатор группы процессов --" << getpgid( getpid()) << endl;
     output<< processName << ": Реальный идентификатор пользователя --" << getuid() << endl;
     output<< processName << ": Эффективный идентификатор пользователя --" << geteuid() << endl;
     output<< processName << ": Реальный групповой идентификатор  --" << getgid() << endl;
