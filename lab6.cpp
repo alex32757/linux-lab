@@ -3,43 +3,51 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 using namespace std;
 
-void signalFunction(int signum) {
-    time_t seconds = time(NULL);
-	tm* timeinfo = localtime(&seconds);
+int period;
 
+void handler_stop(int sigsum) {};
+
+void signalFunction(int signum) {    
 	pid_t pid = fork();
 	if (pid == 0){
+        time_t seconds = time(NULL);
 		cout << "PID потомка: " << getpid() << endl;
-		cout << "Время потомка: " << asctime(timeinfo) << "\n";
-		exit(EXIT_SUCCESS);
+		cout << "Время потомка: " << ctime(&seconds) << "\n";
+		exit(0);
 	}
+    waitpid(pid, NULL, 0);
+
+    period++;
 }
 
 
 int main(int argc, char* argv[]) {
+    time_t seconds_start = time(NULL);
 
-   // signal(SIGALRM, signalFunction);
-    struct sigaction sa;
-    sa.sa_handler = signalFunction;
-    sigaction(SIGALRM, &sa, nullptr);
+    cout << "Старт родителя: " << ctime(&seconds_start) << endl;
+
+    signal(SIGALRM, signalFunction);
+    signal(SIGTSTP, handler_stop);
+
+    period = 0;
 
     itimerval timer;
 	timer.it_interval.tv_sec = atoi(argv[1]);
+    timer.it_interval.tv_usec = 0;
     timer.it_value.tv_sec = atoi(argv[1]);
+    timer.it_value.tv_usec = 0;
 
-    for (int i = 0; i < atoi(argv[2]); i++) {
-        cout << "1" << endl; 
-        setitimer(ITIMER_REAL, &timer, nullptr);
-       // alarm(atoi(argv[1]));
-	//	pause();
-    }
+    setitimer(ITIMER_REAL, &timer, nullptr);
+    
+    while (period != atoi(argv[2]));
 
     time_t seconds = time(NULL);
-	tm* timeinfo = localtime(&seconds);
-	cout << "Время родителя: " << asctime(timeinfo) << "\n";
-	
+	cout << "Окончание родителя: " << ctime(&seconds) << endl;
+	cout << "Общее время работы родителя: " << seconds - seconds_start << "\n";
+    
 	return 0;
 }
