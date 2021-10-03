@@ -9,7 +9,7 @@ using namespace std;
 
 int period;
 
-void handler_stop(int sigsum) {};
+void handlerStop(int sigsum) {};
 
 void signalFunction(int signum) {    
 	pid_t pid = fork();
@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     cout << "Старт родителя: " << ctime(&seconds_start) << endl;
 
     signal(SIGALRM, signalFunction);
-    signal(SIGTSTP, handler_stop);
+    signal(SIGTSTP, handlerStop);
 
     period = 0;
 

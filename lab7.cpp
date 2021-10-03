@@ -7,11 +7,11 @@
 bool pid1_ready = false;
 bool pid2_ready = false;
 
-void handler_usr1(int sig) {
+void handlerUsr1(int sig) {
     pid1_ready = true;
 }
 
-void handler_usr2(int sig) {
+void handlerUsr2(int sig) {
     pid2_ready = true;
 }
 
@@ -22,20 +22,20 @@ int main(int argc, char* argv[]) {
     int pipe1[2];
     pipe(pipe1);
 
-    string pipe1s = to_string(pipe1[0]);
-    string psig1s = to_string(SIGUSR1);
-    string psig2s = to_string(SIGUSR2);
+    string pipe_read = to_string(pipe1[0]);
+    string psig1 = to_string(SIGUSR1);
+    string psig2 = to_string(SIGUSR2);
 
-    signal(SIGUSR1, handler_usr1);
-    signal(SIGUSR2, handler_usr2);
+    signal(SIGUSR1, handlerUsr1);
+    signal(SIGUSR2, handlerUsr2);
 
     pid_t pid1 = fork();
     if (pid1 == 0)
-        execl("./child", "./child", argv[2], (char*)pipe1s.data(), (char*)psig1s.data(), NULL);
+        execl("./child", "./child", argv[2], (char*)pipe_read.data(), (char*)psig1.data(), NULL);
     
     pid_t pid2 = fork();
     if (pid2 == 0)
-        execl("./child", "./child", argv[3], (char*)pipe1s.data(), (char*)psig2s.data(), NULL);
+        execl("./child", "./child", argv[3], (char*)pipe_read.data(), (char*)psig2.data(), NULL);
 
     while (!(pid1_ready && pid2_ready));
     while (!file.eof()) {

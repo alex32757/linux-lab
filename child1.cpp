@@ -7,25 +7,25 @@
 int pipe1;
 std::ofstream file;
 
-void handler_quit(int sig) {
-    exit(0);
-}
-
-void handler_usr(int sig) {
+void handler_usr(int signum) {
     char c;
     read(pipe1, &c, 1);
     file << c;
-    kill(getppid(), sig);
+    kill(getppid(), signum);
+}
+
+void handler_quit(int signum) {
+    exit(0);
 }
 
 int main(int argc, char* argv[]) {
     file.open(argv[1]);
     pipe1 = atoi(argv[2]);
-    int sig = atoi(argv[3]);
+    int signum = atoi(argv[3]);
 
-    signal(sig, handler_usr);
+    signal(signum, handler_usr);
     signal(SIGQUIT, handler_quit);
-    kill(getppid(), sig);
+    kill(getppid(), signum);
 
     while (true);
     return 0;
