@@ -21,9 +21,13 @@ void signalFunction(int signum) {
 	}
     waitpid(pid, NULL, 0);
 
-    period++;
+    if (--period == 0) {
+        time_t seconds = time(NULL);
+        cout << "Время оконачния работы родителя: " << ctime(&seconds);
+        exit(0);
+        
+    }
 }
-
 
 int main(int argc, char* argv[]) {
     time_t seconds_start = time(NULL);
@@ -33,7 +37,7 @@ int main(int argc, char* argv[]) {
     signal(SIGALRM, signalFunction);
     signal(SIGTSTP, handlerStop);
 
-    period = 0;
+    period = atoi(argv[2]);
 
     itimerval timer;
 	timer.it_interval.tv_sec = atoi(argv[1]);
@@ -43,11 +47,12 @@ int main(int argc, char* argv[]) {
 
     setitimer(ITIMER_REAL, &timer, nullptr);
     
-    while (period != atoi(argv[2]));
-
+    for(;;) 
+        pause();
+    
     time_t seconds = time(NULL);
 	cout << "Окончание родителя: " << ctime(&seconds) << endl;
-	cout << "Общее время работы родителя: " << seconds - seconds_start << "\n";
+	cout << "Общее время работы родителя: " << seconds - seconds_start << " секунды\n";
     
 	return 0;
 }
