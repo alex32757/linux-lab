@@ -1,10 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
-#include <cstring>
-#include <sys/wait.h>
 #include <signal.h>
-#include <wait.h>
 
 using namespace std;
 
@@ -23,20 +20,27 @@ int main(int argc, char** argv) {
 	cout << "P1 start" << endl;
 	sigset_t mask;
 	sigemptyset(&mask);
-	sigaddset(&mask, SIGUSR1);
-	sigprocmask(SIG_BLOCK, &mask, nullptr);
-	signal(SIGINT, signal_handler);
+    sigaddset(&mask, SIGUSR1);
+    sigaddset(&mask, SIGUSR2);
+    sigprocmask(SIG_SETMASK, &mask, NULL);
+	sigemptyset(&mask);
+    sigaddset(&mask, SIGUSR1);
+	signal(SIGQUIT, signal_handler);
 
-	while((bytes = read(*argv[2], &c, 1)) || flag) {
-		// if (bytes == 0)
-		// 	break;
-		cout << "P1 ch: " << c << endl;
-		out << c;
-		kill(0, SIGUSR2);
-		sigwait(&mask, &signum);
+	//while((bytes = read(*argv[2], &c, 1)) || flag) {
+	while(true) {
+		if (read(*argv[2], &c, 1)) {	
+			cout << "P1 ch: " << c << endl;
+			out << c;
+			kill(0, SIGUSR2);
+			sigwait(&mask, &signum);
+		} else {
+			if (flag == false) break;
+		}
 	}
 	kill(0, SIGUSR2);
 
 	out.close();
-	exit(EXIT_SUCCESS);
+
+	return 0;
 }
